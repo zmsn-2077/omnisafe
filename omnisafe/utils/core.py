@@ -31,20 +31,6 @@ def set_optimizer(opt: str, module: torch.nn.Module, learning_rate: float):
     return optimizer(module.parameters(), lr=learning_rate)
 
 
-def initialize_layer(init_function: str, layer: torch.nn.Module):
-    """initialize_layer"""
-    if init_function == 'kaiming_uniform':  # this the default!
-        torch.nn.init.kaiming_uniform_(layer.weight, a=np.sqrt(5))
-    elif init_function == 'xavier_normal':
-        torch.nn.init.xavier_normal_(layer.weight)
-    elif init_function in ('glorot', 'xavier_uniform'):
-        torch.nn.init.xavier_uniform_(layer.weight)
-    elif init_function == 'orthogonal':
-        torch.nn.init.orthogonal_(layer.weight, gain=np.sqrt(2))
-    else:
-        raise NotImplementedError
-
-
 def register_actor(actor_name):
     """register actor into global dict"""
 

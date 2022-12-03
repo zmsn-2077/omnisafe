@@ -19,7 +19,7 @@ from torch import nn
 from torch.distributions import MultivariateNormal
 
 from omnisafe.models.model_utils import build_mlp_network
-from omnisafe.utils.core import initialize_layer
+from omnisafe.utils.model_utils import initialize_layer
 
 
 class MLPCholeskyActor(nn.Module):
