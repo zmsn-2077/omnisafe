@@ -15,9 +15,10 @@
 """Implementation of the CPPOPid algorithm."""
 
 import torch
+
 from omnisafe.algorithms import registry
-from omnisafe.common.pid_lagrange import PID_Lagrangian
 from omnisafe.algorithms.on_policy.policy_gradient import PolicyGradient
+from omnisafe.common.pid_lagrange import PID_Lagrangian
 
 
 @registry.register

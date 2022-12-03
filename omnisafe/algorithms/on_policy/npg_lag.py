@@ -17,8 +17,8 @@
 import torch
 
 from omnisafe.algorithms import registry
-from omnisafe.common.lagrange import Lagrange
 from omnisafe.algorithms.on_policy.natural_pg import NaturalPG
+from omnisafe.common.lagrange import Lagrange
 
 
 @registry.register

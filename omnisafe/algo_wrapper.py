@@ -18,11 +18,12 @@ import os
 import sys
 
 import psutil
+
 from omnisafe.algorithms import algo_type, registry
-from omnisafe.utils import distributed_utils
-from omnisafe.utils.tools import get_default_kwargs_yaml
 from omnisafe.evaluator import Evaluator
-from omnisafe.utils.config_utils import recursive_update, check_all_configs
+from omnisafe.utils import distributed_utils
+from omnisafe.utils.config_utils import check_all_configs, recursive_update
+from omnisafe.utils.tools import get_default_kwargs_yaml
 
 
 class AlgoWrapper:

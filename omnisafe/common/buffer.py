@@ -14,9 +14,10 @@
 # ==============================================================================
 """Buffer"""
 
+from copy import deepcopy
+
 import numpy as np
 import torch
-from copy import deepcopy
 
 from omnisafe.utils import distributed_utils
 from omnisafe.utils.core import combined_shape, discount_cumsum

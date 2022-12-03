@@ -22,7 +22,6 @@ import torch
 from torch.optim import Adam
 
 from omnisafe.algorithms import registry
-from omnisafe.common.logger import Logger
 from omnisafe.algorithms.model_based import arc
 from omnisafe.algorithms.model_based.aux import generate_lidar
 
@@ -33,6 +32,7 @@ from omnisafe.algorithms.model_based.models.dynamicsmodel import EnsembleDynamic
 
 ### mbppo and safeloop
 from omnisafe.algorithms.model_based.replay_memory import PPOBuffer, ReplayBuffer, SAC_ReplayBuffer
+from omnisafe.common.logger import Logger
 from omnisafe.models.policy_gradient_base import PolicyGradientBase
 from omnisafe.utils import distributed_utils
 from omnisafe.utils.distributed_utils import proc_id

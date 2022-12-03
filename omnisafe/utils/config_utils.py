@@ -1,6 +1,6 @@
 """config_utils"""
 
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 
 
 def recursive_update(args: dict, update_args: dict):
@@ -50,13 +50,13 @@ def check_all_configs(configs):
     """Check all configs"""
     assert (
         configs.actor_iters > 0 and configs.critic_iters > 0
-    ), "pi_iters and critic_iters must be greater than 0"
+    ), 'pi_iters and critic_iters must be greater than 0'
     assert (
         configs.actor_lr > 0 and configs.critic_lr > 0
-    ), "actor_lr and critic_lr must be greater than 0"
+    ), 'actor_lr and critic_lr must be greater than 0'
     assert (
         configs.buffer_cfgs.gamma >= 0 and configs.buffer_cfgs.gamma < 1.0
-    ), "gamma must be in [0, 1)"
+    ), 'gamma must be in [0, 1)'
     assert (
         configs.use_cost is False and configs.cost_gamma == 1.0
-    ), "if use_cost is False, cost_gamma must be 1.0"
+    ), 'if use_cost is False, cost_gamma must be 1.0'

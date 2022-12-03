@@ -34,6 +34,7 @@ from omnisafe.algorithms.on_policy.ppo_lag import PPOLag
 from omnisafe.algorithms.on_policy.trpo import TRPO
 from omnisafe.algorithms.on_policy.trpo_lag import TRPOLag
 
+
 """init"""
 
 algo_type = {
