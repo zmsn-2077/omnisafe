@@ -19,10 +19,10 @@ from gymnasium.spaces import Box, Discrete
 from torch.distributions import Categorical
 
 import helpers
-from omnisafe.algos.models.actor_critic import ActorCritic
-from omnisafe.algos.models.critic import Critic
-from omnisafe.algos.models.mlp_categorical_actor import MLPCategoricalActor
-from omnisafe.algos.models.mlp_gaussian_actor import MLPGaussianActor
+from omnisafe.models.actor_critic import ActorCritic
+from omnisafe.models.critic import Critic
+from omnisafe.models.mlp_categorical_actor import MLPCategoricalActor
+from omnisafe.models.mlp_gaussian_actor import MLPGaussianActor
 
 
 @helpers.parametrize(
