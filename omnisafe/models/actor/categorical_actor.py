@@ -13,13 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
+import torch.nn as nn
 from torch.distributions.categorical import Categorical
 
-import torch.nn as nn
-
 from omnisafe.models.base import Actor
-from omnisafe.utils.model_utils import build_mlp_network
-from omnisafe.utils.model_utils import Activation, InitFunction
+from omnisafe.utils.model_utils import Activation, InitFunction, build_mlp_network
 
 
 class CategoricalActor(Actor):
@@ -29,11 +27,12 @@ class CategoricalActor(Actor):
         act_dim: int,
         hidden_sizes: list,
         activation: Activation,
-        weight_initialization_mode: InitFunction = "xavier_uniform",
+        weight_initialization_mode: InitFunction = 'xavier_uniform',
         shared=None,
     ):
-        super().__init__(obs_dim, act_dim, hidden_sizes,
-                    activation, weight_initialization_mode, shared=shared)
+        super().__init__(
+            obs_dim, act_dim, hidden_sizes, activation, weight_initialization_mode, shared=shared
+        )
         if shared is not None:
             action_head = build_mlp_network(
                 sizes=[hidden_sizes[-1], act_dim],

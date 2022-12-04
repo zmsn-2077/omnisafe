@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from omnisafe.models.actor import ActorBuilder
 from omnisafe.models.actor_critic import ActorCritic
 from omnisafe.models.constraint_actor_critic import ConstraintActorCritic
-from omnisafe.models.actor import ActorBuilder
 from omnisafe.models.critic import CriticBuilder

@@ -18,10 +18,10 @@ import torch
 import torch.nn as nn
 from gymnasium.spaces import Box, Discrete
 
-from omnisafe.utils.model_utils import build_mlp_network
-from omnisafe.utils.online_mean_std import OnlineMeanStd
 from omnisafe.models.actor import ActorBuilder
 from omnisafe.models.critic import CriticBuilder
+from omnisafe.utils.model_utils import build_mlp_network
+from omnisafe.utils.online_mean_std import OnlineMeanStd
 
 
 class ActorCritic(nn.Module):
@@ -39,13 +39,10 @@ class ActorCritic(nn.Module):
 
         self.obs_shape = observation_space.shape
         self.obs_dim = observation_space.shape[0]
-        self.obs_oms = OnlineMeanStd(
-            shape=self.obs_shape) if standardized_obs else None
+        self.obs_oms = OnlineMeanStd(shape=self.obs_shape) if standardized_obs else None
 
-        self.act_space_type = 'discrete' if isinstance(
-            action_space, Discrete) else 'continuous'
-        self.act_dim = action_space.shape[0] if isinstance(
-            action_space, Box) else action_space.n
+        self.act_space_type = 'discrete' if isinstance(action_space, Discrete) else 'continuous'
+        self.act_dim = action_space.shape[0] if isinstance(action_space, Box) else action_space.n
 
         self.model_cfgs = model_cfgs
         self.ac_kwargs = model_cfgs.ac_kwargs
@@ -70,7 +67,7 @@ class ActorCritic(nn.Module):
             hidden_sizes=self.ac_kwargs.pi.hidden_sizes,
             activation=self.ac_kwargs.pi.activation,
             weight_initialization_mode=model_cfgs.weight_initialization_mode,
-            shared=self.shared
+            shared=self.shared,
         )
         if self.act_space_type == 'discrete':
             self.actor = actor_builder.build_actor('categorical')
@@ -78,7 +75,8 @@ class ActorCritic(nn.Module):
             act_max = torch.as_tensor(action_space.high)
             act_min = torch.as_tensor(action_space.low)
             self.actor = actor_builder.build_actor(
-                self.ac_kwargs.pi.actor_type, act_max=act_max, act_min=act_min)
+                self.ac_kwargs.pi.actor_type, act_max=act_max, act_min=act_min
+            )
 
         # Build critic
         critic_builder = CriticBuilder(
@@ -87,7 +85,7 @@ class ActorCritic(nn.Module):
             hidden_sizes=self.ac_kwargs.val.hidden_sizes,
             activation=self.ac_kwargs.val.activation,
             weight_initialization_mode=model_cfgs.weight_initialization_mode,
-            shared=self.shared
+            shared=self.shared,
         )
         self.reward_critic = critic_builder.build_critic('v')
 
@@ -114,8 +112,7 @@ class ActorCritic(nn.Module):
                 # self.obs_oms.update(obs) if self.training else None
                 obs = self.obs_oms(obs)
             v = self.reward_critic(obs)
-            a, logp_a = self.actor.predict(
-                obs, deterministic=deterministic, need_log_prob=True)
+            a, logp_a = self.actor.predict(obs, deterministic=deterministic, need_log_prob=True)
 
         return a.numpy(), v.numpy(), logp_a.numpy()
 

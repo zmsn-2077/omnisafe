@@ -30,7 +30,7 @@ class Actor(abc.ABC, nn.Module):
         act_dim: int,
         hidden_sizes: list,
         activation: Activation,
-        weight_initialization_mode: InitFunction = "xavier_uniform",
+        weight_initialization_mode: InitFunction = 'xavier_uniform',
         shared: nn.Module = None,
     ):
         nn.Module.__init__(self)
@@ -96,8 +96,8 @@ class Critic(abc.ABC, nn.Module):
         obs_dim: int,
         act_dim: int,
         hidden_sizes: list,
-        activation: Activation = "relu",
-        weight_initialization_mode: InitFunction = "xavier_uniform",
+        activation: Activation = 'relu',
+        weight_initialization_mode: InitFunction = 'xavier_uniform',
         shared: nn.Module = None,
     ):
         nn.Module.__init__(self)

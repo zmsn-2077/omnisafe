@@ -18,7 +18,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.distributions import MultivariateNormal
 
-from omnisafe.utils.model_utils import initialize_layer, build_mlp_network
+from omnisafe.utils.model_utils import build_mlp_network, initialize_layer
 
 
 class MLPCholeskyActor(nn.Module):

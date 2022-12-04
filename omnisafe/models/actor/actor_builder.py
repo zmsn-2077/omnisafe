@@ -16,21 +16,21 @@
 
 import torch.nn as nn
 
-from omnisafe.utils.model_utils import Activation, InitFunction
 from omnisafe.models.actor.categorical_actor import CategoricalActor
 from omnisafe.models.actor.gaussian_annealing_actor import GaussianAnnealingActor
-from omnisafe.models.actor.gaussian_stdnet_actor import GaussianStdNetActor
 from omnisafe.models.actor.gaussian_learning_actor import GaussianLearningActor
+from omnisafe.models.actor.gaussian_stdnet_actor import GaussianStdNetActor
+from omnisafe.utils.model_utils import Activation, InitFunction
 
 
-class ActorBuilder():
+class ActorBuilder:
     def __init__(
         self,
         obs_dim: int,
         act_dim: int,
         hidden_sizes: list,
-        activation: Activation = "relu",
-        weight_initialization_mode: InitFunction = "xavier_uniform",
+        activation: Activation = 'relu',
+        weight_initialization_mode: InitFunction = 'xavier_uniform',
         shared: nn.Module = None,
     ) -> None:
         self.obs_dim = obs_dim
@@ -41,7 +41,7 @@ class ActorBuilder():
         self.shared = shared
 
     def build_actor(self, actor_type: str, **kwargs):
-        if actor_type == "categorical":
+        if actor_type == 'categorical':
             return CategoricalActor(
                 obs_dim=self.obs_dim,
                 act_dim=self.act_dim,
@@ -51,7 +51,7 @@ class ActorBuilder():
                 shared=self.shared,
                 **kwargs,
             )
-        elif actor_type == "gaussian_annealing":
+        elif actor_type == 'gaussian_annealing':
             return GaussianAnnealingActor(
                 obs_dim=self.obs_dim,
                 act_dim=self.act_dim,
@@ -61,7 +61,7 @@ class ActorBuilder():
                 shared=self.shared,
                 **kwargs,
             )
-        elif actor_type == "gaussian_stdnet":
+        elif actor_type == 'gaussian_stdnet':
             return GaussianStdNetActor(
                 obs_dim=self.obs_dim,
                 act_dim=self.act_dim,
@@ -71,7 +71,7 @@ class ActorBuilder():
                 shared=self.shared,
                 **kwargs,
             )
-        elif actor_type == "gaussian_learning":
+        elif actor_type == 'gaussian_learning':
             return GaussianLearningActor(
                 obs_dim=self.obs_dim,
                 act_dim=self.act_dim,
@@ -82,4 +82,4 @@ class ActorBuilder():
                 **kwargs,
             )
         else:
-            raise NotImplementedError(f"Actor type {actor_type} is not implemented.")
+            raise NotImplementedError(f'Actor type {actor_type} is not implemented.')

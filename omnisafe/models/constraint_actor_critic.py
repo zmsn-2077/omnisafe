@@ -54,7 +54,7 @@ class ConstraintActorCritic(ActorCritic):
             hidden_sizes=self.ac_kwargs.val.hidden_sizes,
             activation=self.ac_kwargs.val.activation,
             weight_initialization_mode=self.model_cfgs.weight_initialization_mode,
-            shared=self.shared
+            shared=self.shared,
         )
         self.cost_critic = critic_builder.build_critic('v')
 
@@ -75,6 +75,7 @@ class ConstraintActorCritic(ActorCritic):
             cost_value = self.cost_critic(obs)
 
             action, logp_a = self.actor.predict(
-                obs, deterministic=deterministic, need_log_prob=True)
+                obs, deterministic=deterministic, need_log_prob=True
+            )
 
         return action.numpy(), value.numpy(), cost_value.numpy(), logp_a.numpy()

@@ -16,10 +16,10 @@
 import torch
 import torch.nn as nn
 
-from omnisafe.utils.model_utils import build_mlp_network
-from omnisafe.utils.model_utils import Activation, InitFunction
-from omnisafe.models.critic.v_critic import VCritic
 from omnisafe.models.critic.q_critic import QCritic
+from omnisafe.models.critic.v_critic import VCritic
+from omnisafe.utils.model_utils import Activation, InitFunction, build_mlp_network
+
 
 class CriticBuilder:
     def __init__(
@@ -27,7 +27,7 @@ class CriticBuilder:
         obs_dim: int,
         act_dim: int,
         hidden_sizes: list,
-        activation: Activation = "relu",
+        activation: Activation = 'relu',
         weight_initialization_mode: InitFunction = 'kaiming_uniform',
         shared: nn.Module = None,
     ) -> None:
@@ -39,7 +39,7 @@ class CriticBuilder:
         self.shared = shared
 
     def build_critic(self, critic_type: str):
-        if critic_type == "q":
+        if critic_type == 'q':
             return QCritic(
                 obs_dim=self.obs_dim,
                 act_dim=self.act_dim,
@@ -48,7 +48,7 @@ class CriticBuilder:
                 weight_initialization_mode=self.weight_initialization_mode,
                 shared=self.shared,
             )
-        elif critic_type == "v":
+        elif critic_type == 'v':
             return VCritic(
                 obs_dim=self.obs_dim,
                 act_dim=self.act_dim,

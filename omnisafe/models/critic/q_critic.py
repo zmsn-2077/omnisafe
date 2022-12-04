@@ -16,9 +16,8 @@
 import torch
 import torch.nn as nn
 
-from omnisafe.utils.model_utils import build_mlp_network
-from omnisafe.utils.model_utils import Activation, InitFunction
 from omnisafe.models.base import Critic
+from omnisafe.utils.model_utils import Activation, InitFunction, build_mlp_network
 
 
 class QCritic(Critic):
@@ -27,8 +26,8 @@ class QCritic(Critic):
         obs_dim: int,
         act_dim: int,
         hidden_sizes: list,
-        activation: Activation = "relu",
-        weight_initialization_mode: InitFunction = "xavier_uniform",
+        activation: Activation = 'relu',
+        weight_initialization_mode: InitFunction = 'xavier_uniform',
         shared: nn.Module = None,
     ) -> None:
         Critic.__init__(

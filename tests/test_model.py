@@ -19,9 +19,8 @@ from gymnasium.spaces import Box, Discrete
 from torch.distributions import Categorical
 
 import helpers
+from omnisafe.models import ActorBuilder, CriticBuilder
 from omnisafe.models.actor_critic import ActorCritic
-from omnisafe.models import CriticBuilder
-from omnisafe.models import ActorBuilder
 from omnisafe.utils.config_utils import create_namedtuple_from_dict
 
 
@@ -134,11 +133,15 @@ def test_GaussianActor(
 
     obs = torch.randn(obs_dim, dtype=torch.float32)
     dist = actor(obs)
-    assert isinstance(dist, torch.distributions.Normal), f'Actor output is not a Normal distribution'
+    assert isinstance(
+        dist, torch.distributions.Normal
+    ), f'Actor output is not a Normal distribution'
 
     act = dist.sample()
     dist, logp = actor(obs, act)
-    assert isinstance(dist, torch.distributions.Normal), f'Actor output is not a Normal distribution'
+    assert isinstance(
+        dist, torch.distributions.Normal
+    ), f'Actor output is not a Normal distribution'
     assert logp.shape == torch.Size([]), f'Actor logp output shape is {logp.shape}'
 
     act = actor.predict(obs)
@@ -191,9 +194,9 @@ def test_ActorCritic(
     observation_space = Box(low=-1, high=1, shape=(obs_dim,))
 
     model_cfgs = {
-        "ac_kwargs": ac_kwargs,
-        "weight_initialization_mode": weight_initialization_mode,
-        "shared_weights": shared_weights,
+        'ac_kwargs': ac_kwargs,
+        'weight_initialization_mode': weight_initialization_mode,
+        'shared_weights': shared_weights,
     }
     model_cfgs = create_namedtuple_from_dict(model_cfgs)
 

@@ -34,8 +34,9 @@ class GaussianStdNetActor(Actor):
         weight_initialization_mode,
         shared=None,
     ):
-        super().__init__(obs_dim, act_dim, hidden_sizes,
-                        activation, weight_initialization_mode, shared)
+        super().__init__(
+            obs_dim, act_dim, hidden_sizes, activation, weight_initialization_mode, shared
+        )
         self.act_min = act_min
         self.act_max = act_max
 
@@ -92,7 +93,7 @@ class GaussianStdNetActor(Actor):
 
         if need_log_prob:
             log_prob = dist.log_prob(out).sum(axis=-1)
-            log_prob -= torch.log(1.00001 - torch.tanh(out)**2).sum(axis=-1)
+            log_prob -= torch.log(1.00001 - torch.tanh(out) ** 2).sum(axis=-1)
             return out, log_prob
         return out
 
@@ -102,6 +103,6 @@ class GaussianStdNetActor(Actor):
             act = 2 * (act - self.act_min) / (self.act_max - self.act_min) - 1
             act = torch.tan(act)
             log_prob = dist.log_prob(act).sum(axis=-1)
-            log_prob -= torch.log(1.00001 - torch.tanh(act)**2).sum(axis=-1)
+            log_prob -= torch.log(1.00001 - torch.tanh(act) ** 2).sum(axis=-1)
             return dist, log_prob
         return dist

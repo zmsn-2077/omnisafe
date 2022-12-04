@@ -33,11 +33,11 @@ class GaussianLearningActor(Actor):
         activation,
         weight_initialization_mode,
         shared=None,
-
         satrt_std: float = 0.5,
     ):
-        super().__init__(obs_dim, act_dim, hidden_sizes,
-                        activation, weight_initialization_mode, shared)
+        super().__init__(
+            obs_dim, act_dim, hidden_sizes, activation, weight_initialization_mode, shared
+        )
         self.start_std = satrt_std
         self._std = nn.Parameter(self.start_std * torch.ones(self.act_dim, dtype=torch.float32))
 
