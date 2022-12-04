@@ -33,7 +33,6 @@ from omnisafe.algorithms.model_based.models.dynamicsmodel import EnsembleDynamic
 ### mbppo and safeloop
 from omnisafe.algorithms.model_based.replay_memory import PPOBuffer, ReplayBuffer, SAC_ReplayBuffer
 from omnisafe.common.logger import Logger
-from omnisafe.models.policy_gradient_base import PolicyGradientBase
 from omnisafe.utils import distributed_utils
 from omnisafe.utils.distributed_utils import proc_id
 from omnisafe.utils.tools import get_flat_params_from
@@ -49,7 +48,7 @@ def default_termination_function(state, action, next_state):
 
 
 @registry.register
-class PolicyGradientModelBased(PolicyGradientBase):
+class PolicyGradientModelBased:
     """policy update base class"""
 
     def __init__(self, env, exp_name, data_dir, seed=0, algo='pg', cfgs=None) -> None:

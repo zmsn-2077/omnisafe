@@ -24,13 +24,12 @@ from omnisafe.algorithms import registry
 from omnisafe.common.buffer import Buffer
 from omnisafe.common.logger import Logger
 from omnisafe.models.constraint_actor_critic import ConstraintActorCritic
-from omnisafe.models.policy_gradient_base import PolicyGradientBase
 from omnisafe.utils import core, distributed_utils
 from omnisafe.utils.tools import get_flat_params_from
 
 
 @registry.register
-class PolicyGradient(PolicyGradientBase):
+class PolicyGradient:
     """The PolicyGradient algorithm.
 
     References:
@@ -299,8 +298,10 @@ class PolicyGradient(PolicyGradientBase):
             self.logger.log_tabular('Misc/RewScaleMean', reward_scale_mean)
             self.logger.log_tabular('Misc/RewScaleStddev', reward_scale_stddev)
         if self.cfgs.exploration_noise_anneal:
-            noise_std = np.exp(self.actor_critic.actor.log_std[0].item())
+            noise_std = self.actor_critic.actor.std
             self.logger.log_tabular('Misc/ExplorationNoiseStd', noise_std)
+        if self.cfgs.model_cfgs.ac_kwargs.pi.actor_type == 'gaussian_learning':
+            self.logger.log_tabular('Misc/ExplorationNoiseStd', self.actor_critic.actor.std)
         # Some child classes may add information to logs
         self.algorithm_specific_logs()
         self.logger.log_tabular('TotalEnvSteps', total_env_steps)
@@ -333,8 +334,8 @@ class PolicyGradient(PolicyGradientBase):
     def update_policy_net(self, data) -> None:
         """update policy network"""
         # Get prob. distribution before updates: used to measure KL distance
-        with torch.no_grad():
-            self.p_dist = self.actor_critic.actor.detach_dist(data['obs'])
+        # with torch.no_grad():
+        self.p_dist = self.actor_critic.actor(data['obs'])
 
         # Get loss and info values before update
         pi_l_old, _ = self.compute_loss_pi(data=data)
@@ -355,7 +356,7 @@ class PolicyGradient(PolicyGradientBase):
             distributed_utils.mpi_avg_grads(self.actor_critic.actor.net)  # TODO
             self.actor_optimizer.step()
 
-            q_dist = self.actor_critic.actor.dist(data['obs'])
+            q_dist = self.actor_critic.actor(data['obs'])
             torch_kl = torch.distributions.kl.kl_divergence(self.p_dist, q_dist).mean().item()
 
             if self.cfgs.kl_early_stopping:

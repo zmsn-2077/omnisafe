@@ -17,13 +17,13 @@ import numpy as np
 import torch
 
 from omnisafe.models.actor_q_critic import Actor_Q_Critic
-from omnisafe.models.q_critic import Q_Critic
+from omnisafe.models.critic.q_critic import QCritic
 
 
 class ConstraintQActorCritic(Actor_Q_Critic):
     def __init__(self, **cfgs):
         super().__init__(**cfgs)
-        self.c = Q_Critic(
+        self.c = QCritic(
             obs_dim=self.obs_shape[0], act_dim=self.act_dim, shared=None, **self.ac_kwargs['val']
         )
 

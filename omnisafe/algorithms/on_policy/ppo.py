@@ -34,12 +34,12 @@ class PPO(PolicyGradient):
 
     def compute_loss_pi(self, data: dict):
         """Compute policy loss."""
-        dist, _log_p = self.actor_critic.pi(data['obs'], data['act'])
+        dist, _log_p = self.actor_critic.actor(data['obs'], data['act'])
         # Importance ratio
         ratio = torch.exp(_log_p - data['log_p'])
         ratio_clip = torch.clamp(ratio, 1 - self.clip, 1 + self.clip)
         loss_pi = -(torch.min(ratio * data['adv'], ratio_clip * data['adv'])).mean()
-        loss_pi -= self.entropy_coef * dist.entropy().mean()
+        loss_pi -= self.cfgs.entropy_coef * dist.entropy().mean()
 
         # Useful extra info
         approx_kl = (0.5 * (dist.mean - data['act']) ** 2 / dist.stddev**2).mean().item()

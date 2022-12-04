@@ -18,13 +18,12 @@ import torch
 import torch.nn as nn
 from gymnasium.spaces import Box, Discrete
 
-from omnisafe.models.mlp_actor import MLPActor
-from omnisafe.models.mlp_categorical_actor import MLPCategoricalActor
-from omnisafe.models.mlp_cholesky_actor import MLPCholeskyActor
-from omnisafe.models.mlp_gaussian_actor_off import OMLPGaussianActor
-from omnisafe.models.model_utils import build_mlp_network
-from omnisafe.models.online_mean_std import OnlineMeanStd
-from omnisafe.models.q_critic import Q_Critic
+# from omnisafe.models.mlp_actor import MLPActor
+from omnisafe.models.actor.categorical_actor import CategoricalActor
+from omnisafe.models.actor.cholesky_actor import MLPCholeskyActor
+from omnisafe.models.critic.q_critic import QCritic
+from omnisafe.utils.model_utils import build_mlp_network
+from omnisafe.utils.online_mean_std import OnlineMeanStd
 
 
 class Actor_Q_Critic(nn.Module):
@@ -51,14 +50,14 @@ class Actor_Q_Critic(nn.Module):
         # build policy and value functions
         if isinstance(action_space, Box):
             if pi_type == 'dire':
-                actor_fn = MLPActor
+                actor_fn = MLPCholeskyActor
             elif pi_type == 'chol':
                 actor_fn = MLPCholeskyActor
             else:
                 actor_fn = OMLPGaussianActor
             act_dim = action_space.shape[0]
         elif isinstance(action_space, Discrete):
-            actor_fn = MLPCategoricalActor
+            actor_fn = CategoricalActor
             act_dim = action_space.n
         else:
             raise ValueError
@@ -86,8 +85,8 @@ class Actor_Q_Critic(nn.Module):
             weight_initialization_mode=weight_initialization_mode,
             **ac_kwargs['pi'],
         )
-        self.v = Q_Critic(obs_dim, act_dim, shared=shared, **ac_kwargs['val'])
-        self.v_ = Q_Critic(obs_dim, act_dim, shared=shared, **ac_kwargs['val'])
+        self.v = QCritic(obs_dim, act_dim, shared=shared, **ac_kwargs['val'])
+        self.v_ = QCritic(obs_dim, act_dim, shared=shared, **ac_kwargs['val'])
 
     def step(self, obs, determinstic=False):
         """

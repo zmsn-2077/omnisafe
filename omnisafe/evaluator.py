@@ -22,9 +22,8 @@ from gymnasium.spaces import Box, Discrete
 from gymnasium.utils.save_video import save_video
 
 from omnisafe.algorithms.env_wrapper import EnvWrapper
-from omnisafe.models.mlp_categorical_actor import MLPCategoricalActor
-from omnisafe.models.mlp_gaussian_actor import MLPGaussianActor
-from omnisafe.models.online_mean_std import OnlineMeanStd
+from omnisafe.models import ActorBuilder, CriticBuilder
+from omnisafe.utils.online_mean_std import OnlineMeanStd
 
 
 class Evaluator:
@@ -88,10 +87,10 @@ class Evaluator:
         action_space = self.env.action_space
 
         if isinstance(action_space, Box):
-            actor_fn = MLPGaussianActor
+            actor_fn = GaussianActor
             act_dim = action_space.shape[0]
         elif isinstance(action_space, Discrete):
-            actor_fn = MLPCategoricalActor
+            actor_fn = CategoricalActor
             act_dim = action_space.n
         else:
             raise ValueError

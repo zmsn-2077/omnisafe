@@ -16,7 +16,7 @@
 import torch
 
 from omnisafe.models.actor_critic import ActorCritic
-from omnisafe.models.critic import Critic
+from omnisafe.models.critic import CriticBuilder
 
 
 class ConstraintActorCritic(ActorCritic):
@@ -26,26 +26,37 @@ class ConstraintActorCritic(ActorCritic):
         self,
         observation_space,
         action_space,
-        scale_rewards,
-        standardized_obs,
+        standardized_obs: bool,
+        scale_rewards: bool,
+        # shared_weights: bool,
+        # ac_kwargs: dict,
+        # weight_initialization_mode='kaiming_uniform',
         model_cfgs,
-    ):
+    ) -> None:
         ActorCritic.__init__(
             self,
-            observation_space=observation_space,
-            action_space=action_space,
-            standardized_obs=standardized_obs,
-            scale_rewards=scale_rewards,
-            ac_kwargs=model_cfgs.ac_kwargs,
-            shared_weights=model_cfgs.shared_weights,
+            observation_space,
+            action_space,
+            standardized_obs,
+            scale_rewards,
+            model_cfgs,
         )
 
-        self.cost_critic = Critic(
-            obs_dim=self.obs_shape[0],
-            shared=None,
-            activation=model_cfgs.ac_kwargs.val.activation,
-            hidden_sizes=model_cfgs.ac_kwargs.val.hidden_sizes,
+        # self.cost_critic = VCritic(
+        #     obs_dim=self.obs_shape[0],
+        #     shared=None,
+        #     activation=model_cfgs.ac_kwargs.val.activation,
+        #     hidden_sizes=model_cfgs.ac_kwargs.val.hidden_sizes,
+        # )
+        critic_builder = CriticBuilder(
+            obs_dim=self.obs_dim,
+            act_dim=self.act_dim,
+            hidden_sizes=self.ac_kwargs.val.hidden_sizes,
+            activation=self.ac_kwargs.val.activation,
+            weight_initialization_mode=self.model_cfgs.weight_initialization_mode,
+            shared=self.shared
         )
+        self.cost_critic = critic_builder.build_critic('v')
 
     def step(self, obs, deterministic=False):
         """Produce action, value, log_prob(action).
@@ -63,6 +74,7 @@ class ConstraintActorCritic(ActorCritic):
             value = self.reward_critic(obs)
             cost_value = self.cost_critic(obs)
 
-            action, logp_a = self.actor.predict(obs, deterministic=deterministic)
+            action, logp_a = self.actor.predict(
+                obs, deterministic=deterministic, need_log_prob=True)
 
         return action.numpy(), value.numpy(), cost_value.numpy(), logp_a.numpy()

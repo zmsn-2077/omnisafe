@@ -17,15 +17,15 @@ defaults:
   # Basic Configurations
   epochs: 500
   steps_per_epoch: 30000
-  pi_iters: 80
+  actor_iters: 80
   critic_iters: 40
   check_freq: 25
   save_freq: 100
   entropy_coef: 0.01
   max_ep_len: 1000
   num_mini_batches: 16
-  pi_lr: 0.0003
-  vf_lr: 0.001
+  actor_lr: 0.0003
+  critic_lr: 0.001
   target_kl: 0.01
   data_dir: "./runs"
   seed: 0
@@ -49,6 +49,7 @@ defaults:
     weight_initialization_mode: "kaiming_uniform"
     ac_kwargs:
       pi:
+        actor_type: gaussian_annealing
         hidden_sizes: [64, 64]
         activation: tanh
       val:
@@ -68,15 +69,15 @@ SafetyPointGoal1-v0:
   # Basic Configurations
   epochs: 500
   steps_per_epoch: 20000
-  pi_iters: 40
+  actor_iters: 40
   critic_iters: 20
   check_freq: 25
   save_freq: 100
   entropy_coef: 0.01
   max_ep_len: 1000
   num_mini_batches: 32
-  pi_lr: 0.0003
-  vf_lr: 0.001
+  actor_lr: 0.0003
+  critic_lr: 0.001
   target_kl: 0.01
   data_dir: "./runs"
   seed: 0
@@ -86,7 +87,7 @@ SafetyPointGoal1-v0:
   use_cost: False
   cost_gamma: 1.0
   standardized_obs: True
-  exploration_noise_anneal: True
+  exploration_noise_anneal: False
   kl_early_stopping: True
   linear_lr_decay: False
   reward_penalty: False
@@ -100,6 +101,7 @@ SafetyPointGoal1-v0:
     weight_initialization_mode: "kaiming_uniform"
     ac_kwargs:
       pi:
+        actor_type: gaussian_learning
         hidden_sizes: [64, 64]
         activation: tanh
       val:

@@ -36,7 +36,7 @@ defaults:
   cost_gamma: 1.0
   use_cost_critic: False
   linear_lr_decay: False
-  exploration_noise_anneal: True
+  exploration_noise_anneal: False
   reward_penalty: False
   kl_early_stopping: False
   use_max_grad_norm: False
@@ -49,6 +49,7 @@ defaults:
     weight_initialization_mode: "kaiming_uniform"
     ac_kwargs:
       pi:
+        actor_type: gaussian_learning
         hidden_sizes: [64, 64]
         activation: tanh
       val:

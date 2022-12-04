@@ -109,8 +109,7 @@ class Buffer:
             act = torch.as_tensor(act, dtype=torch.float32)
             with torch.no_grad():
                 # get current log_p of actions
-                dist = self.actor_critic.pi.dist(obs)
-                log_p = self.actor_critic.pi.log_prob_from_dist(dist, act)
+                _, log_p = self.actor_critic.pi(obs, act)
             value_net_targets, adv, _ = calculate_v_trace(
                 policy_action_probs=np.exp(log_p.numpy()),
                 values=vals,

@@ -13,16 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-import numpy as np
+
 import torch
 import torch.nn as nn
 from gymnasium.spaces import Box, Discrete
 
-from omnisafe.models.critic import Critic
-from omnisafe.models.mlp_categorical_actor import MLPCategoricalActor
-from omnisafe.models.mlp_gaussian_actor import MLPGaussianActor
-from omnisafe.models.model_utils import build_mlp_network
-from omnisafe.models.online_mean_std import OnlineMeanStd
+from omnisafe.utils.model_utils import build_mlp_network
+from omnisafe.utils.online_mean_std import OnlineMeanStd
+from omnisafe.models.actor import ActorBuilder
+from omnisafe.models.critic import CriticBuilder
 
 
 class ActorCritic(nn.Module):
@@ -34,62 +33,63 @@ class ActorCritic(nn.Module):
         action_space,
         standardized_obs: bool,
         scale_rewards: bool,
-        shared_weights: bool,
-        ac_kwargs: dict,
-        weight_initialization_mode='kaiming_uniform',
+        model_cfgs,
     ) -> None:
         super().__init__()
 
         self.obs_shape = observation_space.shape
-        self.obs_oms = OnlineMeanStd(shape=self.obs_shape) if standardized_obs else None
+        self.obs_dim = observation_space.shape[0]
+        self.obs_oms = OnlineMeanStd(
+            shape=self.obs_shape) if standardized_obs else None
 
-        self.ac_kwargs = ac_kwargs
+        self.act_space_type = 'discrete' if isinstance(
+            action_space, Discrete) else 'continuous'
+        self.act_dim = action_space.shape[0] if isinstance(
+            action_space, Box) else action_space.n
 
-        # policy builder depends on action space
-        if isinstance(action_space, Box):
-            actor_fn = MLPGaussianActor
-            act_dim = action_space.shape[0]
-        elif isinstance(action_space, Discrete):
-            actor_fn = MLPCategoricalActor
-            act_dim = action_space.n
-        else:
-            raise ValueError
-
-        obs_dim = observation_space.shape[0]
+        self.model_cfgs = model_cfgs
+        self.ac_kwargs = model_cfgs.ac_kwargs
 
         # Use for shared weights
-        layer_units = [obs_dim] + ac_kwargs.pi.hidden_sizes
-
-        activation = ac_kwargs.pi.activation
-        if shared_weights:
-            shared = build_mlp_network(
+        layer_units = [self.obs_dim] + self.ac_kwargs.pi.hidden_sizes
+        activation = self.ac_kwargs.pi.activation
+        if model_cfgs.shared_weights:
+            self.shared = build_mlp_network(
                 layer_units,
                 activation=activation,
-                weight_initialization_mode=weight_initialization_mode,
+                weight_initialization_mode=model_cfgs.weight_initialization_mode,
                 output_activation=activation,
             )
         else:
-            shared = None
+            self.shared = None
 
-        self.actor = actor_fn(
-            obs_dim=obs_dim,
-            act_dim=act_dim,
-            shared=shared,
-            weight_initialization_mode=weight_initialization_mode,
-            activation=ac_kwargs.pi.activation,
-            hidden_sizes=ac_kwargs.pi.hidden_sizes,
+        # Build actor
+        actor_builder = ActorBuilder(
+            obs_dim=self.obs_dim,
+            act_dim=self.act_dim,
+            hidden_sizes=self.ac_kwargs.pi.hidden_sizes,
+            activation=self.ac_kwargs.pi.activation,
+            weight_initialization_mode=model_cfgs.weight_initialization_mode,
+            shared=self.shared
         )
+        if self.act_space_type == 'discrete':
+            self.actor = actor_builder.build_actor('categorical')
+        else:
+            act_max = torch.as_tensor(action_space.high)
+            act_min = torch.as_tensor(action_space.low)
+            self.actor = actor_builder.build_actor(
+                self.ac_kwargs.pi.actor_type, act_max=act_max, act_min=act_min)
 
-        #         obs_dim: int,
-        # hidden_sizes: list,
-        # activation: str,
-        # shared=None,
-        self.reward_critic = Critic(
-            obs_dim,
-            shared=shared,
-            activation=ac_kwargs.val.activation,
-            hidden_sizes=ac_kwargs.val.hidden_sizes,
+        # Build critic
+        critic_builder = CriticBuilder(
+            obs_dim=self.obs_dim,
+            act_dim=self.act_dim,
+            hidden_sizes=self.ac_kwargs.val.hidden_sizes,
+            activation=self.ac_kwargs.val.activation,
+            weight_initialization_mode=model_cfgs.weight_initialization_mode,
+            shared=self.shared
         )
+        self.reward_critic = critic_builder.build_critic('v')
 
         self.ret_oms = OnlineMeanStd(shape=(1,)) if scale_rewards else None
 
@@ -113,13 +113,11 @@ class ActorCritic(nn.Module):
                 # Note: Update RMS in Algorithm.running_statistics() method
                 # self.obs_oms.update(obs) if self.training else None
                 obs = self.obs_oms(obs)
-            v = self.v(obs)
-            a, logp_a = self.pi.predict(obs, deterministic=deterministic)
+            v = self.reward_critic(obs)
+            a, logp_a = self.actor.predict(
+                obs, deterministic=deterministic, need_log_prob=True)
 
         return a.numpy(), v.numpy(), logp_a.numpy()
-
-    def act(self, obs):
-        return self.step(obs)[0]
 
     def anneal_exploration(self, frac):
         """update internals of actors
@@ -128,4 +126,4 @@ class ActorCritic(nn.Module):
                 e.g. 10 / 100 = 0.1
         """
         if hasattr(self.actor, 'set_log_std'):
-            self.actor.set_log_std(1 - frac)
+            self.actor.set_std(1 - frac)
